@@ -65,12 +65,22 @@ public class PortoController {
     @FXML
     void doVisCluster(ActionEvent event) {
 
+    	StringBuilder s=model.getCluster();
+    	txtResult.setText(s.toString());
+    	
     }
 
     @FXML
     void doVisCoautori(ActionEvent event) {
-    	StringBuilder s=model.getCoautori(cmbAutore1.getValue());
-    	txtResult.setText(s.toString());
+    	
+    	txtResult.setText("");
+    	
+    	if(cmbAutore1.getValue()!=null){
+	    	StringBuilder s=model.getCoautori(cmbAutore1.getValue());
+	    	txtResult.setText(s.toString());
+    	}
+    	else
+    		txtResult.setText("ERRORE: inserire un autore!");
     }
 
     @FXML
