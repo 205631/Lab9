@@ -2,8 +2,11 @@ package it.polito.tdp.porto.model;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
 import org.jgrapht.Graphs;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.Multigraph;
@@ -19,6 +22,8 @@ public class PortoModel {
 	private Map<Long,Article> articles;
 	
 	private Multigraph<Creator,DefaultEdge> grafo;
+	
+	private Set<Article> listaArticoliInComune;
 	
 	private CreatorDAO cDAO=new CreatorDAO();
 	private ArticleDAO aDAO=new ArticleDAO();
@@ -116,19 +121,35 @@ public class PortoModel {
 	
 	public StringBuilder getArticoliAutori(Creator c1,Creator c2){
 		
+		listaArticoliInComune=new HashSet<Article>();
+		
 		StringBuilder s=new StringBuilder();
 		
 		if(this.isCoautori(c1, c2)==false){
 			//algoritmo di ricerca
-			
-			
-			return s;
+			if(this.isCluster(c1, c2)==true){
+				
+				ricorsione(c1,c2,new ArrayList<Article>(),new ArrayList<Creator>());
+				
+				s.append("Articoli che collegano l'autore "+c1.toString()+" e l'autore "+c2.toString()+":");
+				
+				if(listaArticoliInComune.isEmpty()==true){
+					s.append("\nNESSUNO!");
+				}else{
+					for(Article a:listaArticoliInComune){
+						s.append("\n"+a.toString()+";");
+					}
+				}
+				return s;
+			}else{
+				s.append("L'autore "+c1.toString()+" e l'autore "+c2.toString()+" non sono collegati!");
+				return s;
+			}
 		}else{
 			s.append("L'autore "+c1.toString()+" e l'autore "+c2.toString()+" sono coautori!");
 			return s;
 		}
 	}
-	
 	
 	public boolean isCoautori(Creator c1,Creator c2){
 		
@@ -142,5 +163,49 @@ public class PortoModel {
 		return ris;
 	}
 	
+	public boolean isCluster(Creator c1,Creator c2){
+		
+		boolean ris=false;
+				
+		GraphIterator<Creator, DefaultEdge> dfv = new DepthFirstIterator<Creator, DefaultEdge>(grafo,c1);
+				
+		while(dfv.hasNext()){
+			Creator t=dfv.next();
+			if(c2.equals(t))
+				ris=true;
+			
+		}
+		
+		return ris;
+	}
+	
+	public void ricorsione(Creator c1,Creator c2,List<Article> tempRis, List<Creator> visited){
+
+		if(c1.equals(c2)==true){
+			//copiare lista nel riultato
+			listaArticoliInComune.addAll(new ArrayList<Article>(tempRis));
+			return;
+		}
+		
+		List<Article> articoliPartenza=c1.getArticleList();
+		
+		List<Article> articoliVicino;
+		
+		List<Creator> l=Graphs.neighborListOf(grafo, c1);
+		
+		for(Creator c:l){
+			if(visited.contains(c)==true)
+				break;
+			articoliVicino=c.getArticleList();
+			for(Article a:articoliPartenza){
+				if(articoliVicino.contains(a)==true){
+					tempRis.add(a);
+				}
+			}
+			visited.add(c);
+			ricorsione(c,c2,tempRis,visited);
+		}
+		
+	}
 	
 }

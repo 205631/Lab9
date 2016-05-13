@@ -76,7 +76,9 @@ public class Article{
 		return true;
 	}
 
-	
+	public String toString(){
+		return eprintid+" "+title;
+	}
 	
 	
 }

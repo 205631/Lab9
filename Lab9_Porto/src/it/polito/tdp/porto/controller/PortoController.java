@@ -60,6 +60,15 @@ public class PortoController {
     @FXML
     void doVisArticoli(ActionEvent event) {
 
+    	txtResult.setText("");
+    	
+    	if(cmbAutore1.getValue()!=null && cmbAutore2.getValue()!=null){
+	    	StringBuilder s=model.getArticoliAutori(cmbAutore1.getValue(),cmbAutore2.getValue());
+	    	txtResult.setText(s.toString());
+    	}
+    	else
+    		txtResult.setText("ERRORE: inserire due autori!");
+    	
     }
 
     @FXML
