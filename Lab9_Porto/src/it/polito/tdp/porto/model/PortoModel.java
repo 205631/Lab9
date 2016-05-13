@@ -130,7 +130,7 @@ public class PortoModel {
 			if(this.isCluster(c1, c2)==true){
 				
 				ricorsione(c1,c2,new ArrayList<Article>(),new ArrayList<Creator>());
-				
+				System.out.println(listaArticoliInComune.size());
 				s.append("Articoli che collegano l'autore "+c1.toString()+" e l'autore "+c2.toString()+":");
 				
 				if(listaArticoliInComune.isEmpty()==true){
@@ -194,16 +194,17 @@ public class PortoModel {
 		List<Creator> l=Graphs.neighborListOf(grafo, c1);
 		
 		for(Creator c:l){
-			if(visited.contains(c)==true)
-				break;
-			articoliVicino=c.getArticleList();
-			for(Article a:articoliPartenza){
-				if(articoliVicino.contains(a)==true){
-					tempRis.add(a);
+			if(visited.contains(c)==false){
+				//break;
+				articoliVicino=c.getArticleList();
+				for(Article a:articoliPartenza){
+					if(articoliVicino.contains(a)==true){
+						tempRis.add(a);
+					}
 				}
+				visited.add(c);
+				ricorsione(c,c2,tempRis,visited);
 			}
-			visited.add(c);
-			ricorsione(c,c2,tempRis,visited);
 		}
 		
 	}
